@@ -1,0 +1,45 @@
+{% extends "page.html" %}
+{% block head %}
+<title>{{ model.Title }} | Pollz</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>{{ model.Title }}</h1>
+      <p>{{ model.Question }}</p>
+      
+      <ul>         
+        {% for item in model.Results %}
+          <li>
+            {{ item.Option }} (<span id="answer-{{ forloop.index }}">{{ item.Votes }}</span>)
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div id="chart">
+        <!-- STEP #6: Once you add a chart to the model, display it here! -->
+      </div>
+    </div>
+  </div>  
+</div>
+
+<script type="text/javascript">
+  // Connect to the server using Web Sockets
+  var websocketUrl = window.location.toString().replace("http", "ws") + "/updates";
+  var websocket = new WebSocket(websocketUrl);
+
+  websocket.onmessage = function (evt) {
+    // Read the update and modify the web site
+    window.alert(evt.data);
+
+    // TASK #9: Just uncomment the following JS, which updates the page :-)
+    //
+    // var update = JSON.parse(evt.data);
+    // for (var i = 0; i < update.votes.length; i++) 
+    //   document.getElementById("answer-" + (i + 1)).innerHTML = update.votes[i];
+    // document.getElementById("chart").innerHTML = update.chart;
+  };
+</script>
+{% endblock %}
