@@ -20,7 +20,30 @@ DotLiquid.setTemplatesDir (__SOURCE_DIRECTORY__ + "/templates")
 // -------------------------------------------------------------------------------------------------
 
 let app_1 = 
-  Successful.OK "Hello world!"
+  Successful.OK "Hello Krakow!"
+
+
+let app_1b =
+  choose
+    [ path "/foo" >=> Successful.OK "Hello Krakow!!!!!!" 
+      pathScan "/add/%d/%d" (fun (a, b) -> 
+        Successful.OK(string (a + b)) )
+      Successful.OK "Hello rest of the world!" ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 let app_2 =
   choose
@@ -38,19 +61,20 @@ let app_2 =
 
 type News = 
   { Title : string 
-    Description : string
+    DesCription : string
     Link : string }
 
 // Create a value of type News
 let newsItem id =
   { Title = sprintf "Suave workshop %d!" id
-    Description = "Suave workshop is happening today, do not miss it!"
+    DesCription = "Suave workshop is happening today, do not miss it!"
     Link = "http://www.fsharpworks.com" }
     
 // Working with collections using higher-order functions
 let demo3 = 
   [ 1 .. 10 ]
   |> Seq.map (fun i -> newsItem i)
+  |> Seq.filter (fun n -> n.Title.Contains "5")
   |> List.ofSeq
 
 let app_3 = 
@@ -71,14 +95,35 @@ let app_4 =
 // TODO: Show weather forecast for the next few days:
 // "http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&q=Krakow&APPID=cb63a1cf33894de710a1e3a64f036a27"
 
+type Weather = JsonProvider<"http://api.openweathermap.org/data/2.5/forecast/daily?units=metric&q=Krakow&APPID=cb63a1cf33894de710a1e3a64f036a27">
 type RssFeed = XmlProvider<"http://fpish.net/rss/blogs/tag/1/f~23">
 
-let rss = RssFeed.GetSample() 
-  
+let rss = RssFeed.Load("http://feeds.bbci.co.uk/news/rss.xml")
+let w = Weather.GetSample()
+
+let data =
+  rss.Channel.Items 
+  |> Seq.map (fun i ->
+      { Title = i.Title
+        DesCription = i.Description
+        Link = i.Link } )
+
+let app_w = 
+  DotLiquid.page "home.html" data
+
+
+
+
+
+
+
+
+
+
 let news = 
   [ for item in rss.Channel.Items do
-      yield newsItem ]
-
+      yield item ]
+  
 let app_5 = 
   DotLiquid.page "home.html" news
 
@@ -86,7 +131,7 @@ let app_5 =
 // ENTRY POINT: Choose which of the demos to run here!
 // -------------------------------------------------------------------------------------------------
 
-let app = app_1
+let app = app_w
 
 
 // -------------------------------------------------------------------------------------------------

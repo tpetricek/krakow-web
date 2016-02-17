@@ -31,20 +31,14 @@ let pollsFolder = dataFolder + "/polls"
 // name for the link, use `Path.GetFileNameWithoutExtension` on the
 // full file name:
 
-let ``TUTORIAL DEMO #1`` () = 
-  // Say we have a file name 'file'
-  let file = "???"
-  // Then we can load poll data for the file
-  let pollInfo = PollJson.Load(file)
-  // And we can easily access data from JSON!
-  pollInfo
-
-
 // You can delee the `TUTORIAL DEMO #1` function and implement the following:
 let homePolls () = 
-  [ { Link = "test"
-      Title = "Fake question"
-      Question = "What is your favourite colour?"} ]
+  Directory.GetFiles(pollsFolder)
+  |> Seq.map (fun file ->
+     let pollInfo = PollJson.Load(file)
+     { Link = Path.GetFileNameWithoutExtension(file)
+       Title = pollInfo.Title
+       Question = pollInfo.Question }) 
 
 // When we receive a request to the '/' path, the lambda function is
 // invoked, we load data using the 'homePolls' function and pass it

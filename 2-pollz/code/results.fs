@@ -39,15 +39,22 @@ let ``TUTORIAL DEMO #2`` () =
   [ 0;1;0;1;0 ]
   |> List.filter (fun x -> x = 0)
   |> List.length
-
+  
+let countVotes pollName index =
+  match votes.TryFind pollName with
+  | None -> 0
+  | Some currentVotes -> 
+      currentVotes |> Seq.filter (fun v -> v = index) |> Seq.length
 
 // You can delee the `TUTORIAL DEMO #1` function and implement the following:
 let getResults pollName =
-  { Title = "Testing"
-    Question = "What is your favourite color?"
+  let pollInfo = loadPoll pollName
+  { Title = pollInfo.Title
+    Question = pollInfo.Question
     Results = 
-        [ { Option = "Yo"; Votes = 2 }
-          { Option = "Nae"; Votes = 5 } ] }
+        pollInfo.Answers |> Array.mapi (fun index option ->
+          { Option = option
+            Votes = countVotes pollName index }) }
 
 let part1 =
   pathScan "/results/%s" (fun name ->

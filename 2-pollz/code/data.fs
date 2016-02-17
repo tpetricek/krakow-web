@@ -8,6 +8,8 @@ let votesFile = dataFolder + "/votes.json"
 
 // Use JSON type provider to get a type representing polls (used in `home.fs`)
 type PollJson = JsonProvider<"code/sample-poll.json">
+type VotesJson = JsonProvider<"code/sample-votes.json">
+
 
 // ----------------------------------------------------------------------------
 // STEP #2: Implement code to display the poll results. To do this, you first
@@ -23,7 +25,7 @@ type Votes = Map<string, list<int>>
 
 /// Load information about specified poll using PollJson.Load
 let loadPoll name : PollJson.Root = 
-  failwith "Not implemented!"
+  PollJson.Load(dataFolder + "/polls/" + name + ".json")
 
 // Define a type `VotesJson` using the `code/sample-votes.json` as
 // the sample file - we can then use this to read `votesFile`
@@ -31,11 +33,13 @@ let loadPoll name : PollJson.Root =
 /// Load information about votes from `votesFile` using 
 /// `VotesJson`. You'll also need the `Map.ofSeq` function!
 let loadVotes() : Votes =
-  failwith "Not implemented!"
+  [ for poll in VotesJson.Load(votesFile) do
+      yield poll.Poll, List.ofArray poll.Votes ]
+  |> Map.ofSeq 
 
 /// Define a global variable that keeps info of the votes 
 /// (Call `loadVotes` once you implemented it!)
-let votes : Votes = Map.empty 
+let votes : Votes = loadVotes ()
 
 // ----------------------------------------------------------------------------
 // STEP #4: To implement updating of poll results, we'll make the `votes` 
